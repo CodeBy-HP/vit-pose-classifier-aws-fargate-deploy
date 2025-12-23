@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: ${{ secrets.ECR_REGISTRY }}
   REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
   IMAGE_TAG: ${{ github.sha }}
 

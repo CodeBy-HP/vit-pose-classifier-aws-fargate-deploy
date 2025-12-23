@@ -3,14 +3,11 @@
 import boto3
 import os
 import logging
-from dotenv import load_dotenv
 from botocore.exceptions import ClientError
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-bucket_name = os.getenv("AWS_BUCKET_NAME")
+bucket_name="bert-finetune-e1a89ee8"
 if not bucket_name:
     logger.warning("AWS_BUCKET_NAME environment variable not set")
 

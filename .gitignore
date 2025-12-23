@@ -199,4 +199,4 @@ train_dir
 .aws
 fastapi_app/.env
 train_dir
-tinybert-sentiment-analysis
+
