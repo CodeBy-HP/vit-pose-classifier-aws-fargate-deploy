@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pose Classification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Pose Classification</h1>
+                <p class="text-slate-400 text-sm">Upload an image to classify human poses</p>
+            </div>
+
+            <!-- Main Card -->
+            <div class="bg-slate-800 rounded-lg shadow-xl overflow-hidden border border-slate-700">
+                <!-- Upload Section -->
+                <div class="p-8">
+                    <form id="uploadForm" class="space-y-6">
+                        <!-- File Input -->
+                        <div class="relative">
+                            <input
+                                type="file"
+                                id="imageInput"
+                                accept="image/*"
+                                class="hidden"
+                                required
+                            >
+                            <label
+                                for="imageInput"
+                                class="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-slate-600 rounded-lg cursor-pointer transition hover:border-blue-400 hover:bg-slate-700/50"
+                            >
+                                <div class="text-center">
+                                    <svg class="w-10 h-10 mx-auto mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <p class="text-slate-300 font-medium">Click to upload image</p>
+                                    <p class="text-slate-500 text-xs mt-1">PNG, JPG, JPEG up to 10MB</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div id="previewContainer" class="hidden">
+                            <img id="imagePreview" class="w-full h-64 object-cover rounded-lg" alt="Preview">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                            type="submit"
+                            id="submitBtn"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled
+                        >
+                            Classify Pose
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsContainer" class="hidden border-t border-slate-700 bg-slate-700/30 p-8">
+                    <h2 class="text-white font-semibold mb-4 text-lg">Classification Results</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Prediction -->
+                        <div class="bg-slate-800/50 rounded-lg p-4">
+                            <p class="text-slate-400 text-sm mb-1">Detected Pose</p>
+                            <p id="predictionLabel" class="text-white text-2xl font-bold">-</p>
+                        </div>
+
+                        <!-- Confidence -->
+                        <div class="bg-slate-800/50 rounded-lg p-4">
+                            <p class="text-slate-400 text-sm mb-2">Confidence</p>
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-1 bg-slate-700 rounded-full h-2">
+                                    <div id="confidenceBar" class="bg-green-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
+                                <p id="confidenceScore" class="text-white font-semibold min-w-fit">0%</p>
+                            </div>
+                        </div>
+
+                        <!-- Inference Time -->
+                        <div class="bg-slate-800/50 rounded-lg p-4">
+                            <p class="text-slate-400 text-sm mb-1">Inference Time</p>
+                            <p id="inferenceTime" class="text-white text-lg font-semibold">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button
+                        onclick="resetForm()"
+                        class="w-full mt-6 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-lg transition"
+                    >
+                        Classify Another Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="loadingContainer" class="hidden mt-4 text-center">
+                <div class="inline-block">
+                    <div class="animate-spin h-8 w-8 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+                </div>
+                <p class="text-slate-400 mt-2">Processing image...</p>
+            </div>
+
+            <div id="errorContainer" class="hidden mt-4 p-4 bg-red-900/30 border border-red-700 rounded-lg">
+                <p id="errorMessage" class="text-red-300 text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Handle image selection
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showError('Image size must be less than 10MB');
+                    imageInput.value = '';
+                    submitBtn.disabled = true;
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    previewContainer.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    errorContainer.classList.add('hidden');
+                    resultsContainer.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            loadingContainer.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/v1/classify', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Classification failed');
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                showError(error.message || 'An error occurred during classification');
+            } finally {
+                submitBtn.disabled = false;
+                loadingContainer.classList.add('hidden');
+            }
+        });
+
+        function displayResults(data) {
+            const confidence = (data.prediction.score * 100).toFixed(1);
+            
+            document.getElementById('predictionLabel').textContent = data.prediction.label;
+            document.getElementById('confidenceScore').textContent = confidence + '%';
+            document.getElementById('confidenceBar').style.width = confidence + '%';
+            document.getElementById('inferenceTime').textContent = data.prediction_time_ms + ' ms';
+            
+            resultsContainer.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
+
+        function resetForm() {
+            imageInput.value = '';
+            previewContainer.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+            submitBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>
