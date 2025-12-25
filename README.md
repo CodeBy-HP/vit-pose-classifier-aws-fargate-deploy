@@ -21,9 +21,11 @@ Production-grade human pose classification API featuring **fine-tuned Vision Tra
 
 ---
 
-## 🌈 Application Demo
+## 🌈 Application UI
 
-*[Image: Screenshot of pose classification web interface]*
+<div align="center">
+<img width="493" height="858" alt="Screenshot 2025-12-23 232355" src="https://github.com/user-attachments/assets/1a9bcc84-0e43-4327-a866-ea3211715dd5" />
+</div>
 
 ---
 
@@ -32,7 +34,7 @@ Production-grade human pose classification API featuring **fine-tuned Vision Tra
 <p align="center">
   <a href="https://youtube.com/" target="_blank">
     <img 
-      src="https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg"
+      src="https://img.youtube.com/vi/UcwIQ7bP31Y/maxresdefault.jpg"
       alt="Watch Demo"
       width="700"
     />
@@ -47,12 +49,17 @@ Production-grade human pose classification API featuring **fine-tuned Vision Tra
 
 <div align="center">
 
-*[Image: Serverless architecture - ALB → ECS Fargate → ViT Model]*
+<img width="817" height="1056" alt="Screenshot 2025-12-25 184002" src="https://github.com/user-attachments/assets/8698a773-84dc-4f3e-a91a-1757a9e7cf94" />
+<img width="880" height="515" alt="Screenshot 2025-12-25 184702" src="https://github.com/user-attachments/assets/f012f5a2-5f85-45a8-aa89-556bb827e694" />
 
-*[Image: CI/CD pipeline - GitHub → Actions → ECR → ECS Auto-deployment]*
+</div>
 
-*[Image: Multi-AZ deployment with health checks and auto-scaling]*
+---
 
+## CI/CD Pipeline
+
+<div align="center">
+<img width="566" height="756" alt="Screenshot 2025-12-25 184028" src="https://github.com/user-attachments/assets/68945957-4715-4ab7-8799-231ffbe8fcb7" />
 </div>
 
 ---
@@ -122,43 +129,6 @@ human-pose-classification/
 
 ---
 
-## 🏗️ Architecture Highlights
-
-**Request Flow:**
-```
-User Request (HTTP)
-    ↓
-Application Load Balancer (Port 80)
-    ↓
-Target Group (Health Checks)
-    ↓
-AWS Fargate Task(s) (Port 8000)
-    ↓
-FastAPI + ViT Model
-    ↓
-Pose Classification Response
-```
-
-**Serverless Deployment:**
-```
-ECS Cluster (Control Plane)
-    ↓
-Task Definition (Blueprint: Image, CPU, Memory)
-    ↓
-ECS Service (Desired Count: 2 tasks)
-    ↓
-Fargate Tasks (AWS-managed infrastructure)
-    ↓
-Auto-registered with ALB Target Group
-```
-
-**CI/CD Pipeline:**
-```
-Push to Main → Build Image → Push to ECR → Update ECS Service → Rolling Update
-```
-
----
-
 ## 🎓 What I Learned
 
 - Vision Transformer architecture and self-attention mechanisms
@@ -212,7 +182,5 @@ Push to Main → Build Image → Push to ECR → Update ECS Service → Rolling 
 <div align="center">
 
 **⭐ If you find this project helpful, please star it!**
-
-Built with ❤️ using Vision Transformers and AWS Serverless
 
 </div>
