@@ -32,7 +32,7 @@ Production-grade human pose classification API featuring **fine-tuned Vision Tra
 ## 🌈 Video Demo
 
 <p align="center">
-  <a href="https://youtube.com/" target="_blank">
+  <a href="https://www.youtube.com/watch?v=UcwIQ7bP31Y" target="_blank">
     <img 
       src="https://img.youtube.com/vi/UcwIQ7bP31Y/maxresdefault.jpg"
       alt="Watch Demo"
