@@ -18,6 +18,12 @@ from scripts.data_model import (
     PosePrediction,
 )
 from scripts.s3 import download_model_from_s3
+from scripts.huggingface_load import download_model_from_huggingface
+
+# Toggle between S3 and Hugging Face model loading
+# Set USE_HUGGINGFACE_MODELS = False to use S3 loader (production)
+# Set USE_HUGGINGFACE_MODELS = True to use Hugging Face loader (Spaces deployment)
+USE_HUGGINGFACE_MODELS = False
 
 warnings.filterwarnings("ignore")
 
@@ -60,10 +66,15 @@ def initialize_model():
         
         # Download model if not present
         if not os.path.isdir(LOCAL_MODEL_PATH) or FORCE_DOWNLOAD:
-            logger.info(f"Downloading model from S3 to {LOCAL_MODEL_PATH}")
-            success = download_model_from_s3(LOCAL_MODEL_PATH, f"{MODEL_NAME}/")
+            if USE_HUGGINGFACE_MODELS:
+                logger.info(f"Downloading model from Hugging Face to {LOCAL_MODEL_PATH}")
+                success = download_model_from_huggingface(LOCAL_MODEL_PATH)
+            else:
+                logger.info(f"Downloading model from S3 to {LOCAL_MODEL_PATH}")
+                success = download_model_from_s3(LOCAL_MODEL_PATH, f"{MODEL_NAME}/")
+            
             if not success:
-                logger.error("Failed to download model from S3")
+                logger.error("Failed to download model")
                 return False
         
         # Load image processor
